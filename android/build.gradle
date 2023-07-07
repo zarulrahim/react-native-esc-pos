@@ -51,6 +51,7 @@ android {
     }
 
     dependencies {
+        implementation 'com.github.easyeat-ai:react-native-esc-pos:Tag'
          implementation 'com.github.easyeat-ai:esc-pos-java:master-SNAPSHOT'
     }
 
@@ -117,6 +118,8 @@ repositories {
             }
         })
     }
+
+    maven { url 'https://jitpack.io' }
 
     if (!found) {
         throw new GradleException(
