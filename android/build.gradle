@@ -52,6 +52,8 @@ android {
 
     dependencies {
         implementation 'com.github.easyeat-ai:esc-pos-java:master-SNAPSHOT'
+        implementation files('libs/freeimagelibrary.jar')
+
     }
 
 }
