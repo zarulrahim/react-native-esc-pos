@@ -239,6 +239,12 @@ public class EscPosModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void kickCashDrawerImin(Promise promise) {
+        printerService.kickCashDrawerImin();
+        promise.resolve(true);
+    }
+
+    @ReactMethod
     public void connectBluetoothPrinter(String address, Promise promise) {
         try {
             if (!"bluetooth".equals(config.getString("type"))) {

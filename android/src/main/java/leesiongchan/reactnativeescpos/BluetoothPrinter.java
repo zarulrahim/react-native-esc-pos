@@ -3,7 +3,7 @@ package leesiongchan.reactnativeescpos;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import com.imin.library.IminSDKManager;
+
 import io.github.escposjava.print.Printer;
 
 import java.io.IOException;
@@ -50,8 +50,4 @@ public class BluetoothPrinter implements Printer {
             e.printStackTrace();
         }
     }
-    public void openCashDrawerPin2() {
-      //write(CD_KICK_2);
-      IminSDKManager.opencashBox();
-   }
 }
