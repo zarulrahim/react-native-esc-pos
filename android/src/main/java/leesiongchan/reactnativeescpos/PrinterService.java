@@ -6,6 +6,7 @@ import android.graphics.ImageDecoder;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
+import com.imin.library.IminSDKManager;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.google.zxing.BarcodeFormat;
@@ -195,6 +196,9 @@ public class PrinterService {
         basePrinterService.write(CD_KICK_5);
     }
 
+    public void kickCashDrawerImin() {
+        IminSDKManager.opencashBox();
+    }
     /**
      * DESIGN 1: Order List                       *
      *          D0004 | Table #: A1 {C} {H1}      *
