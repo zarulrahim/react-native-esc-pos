@@ -142,7 +142,6 @@ dependencies {
 
     implementation 'org.apache.commons:commons-lang3:3.4'
     implementation files('libs/IminLibs.jar')
-
 }
 
 if (isNewArchitectureEnabled()) {

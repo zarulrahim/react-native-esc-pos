@@ -200,9 +200,7 @@ public class PrinterService {
     public void kickCashDrawerImin() {
         IminSDKManager.opencashBox();
     }
-
-
-
+    
     /**
      * DESIGN 1: Order List                       *
      *          D0004 | Table #: A1 {C} {H1}      *
