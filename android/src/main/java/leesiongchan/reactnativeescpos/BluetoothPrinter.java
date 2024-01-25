@@ -3,6 +3,7 @@ package leesiongchan.reactnativeescpos;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.os.AsyncTask;
 import io.github.escposjava.print.Printer;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -24,37 +25,61 @@ public class BluetoothPrinter implements Printer {
   }
 
   public void open() {
-    try {
-      BluetoothDevice device = adapter.getRemoteDevice(address);
-      BluetoothSocket socket = device.createRfcommSocketToServiceRecord(
-        SPP_UUID
-      );
-
-      socket.connect();
-      printer = socket.getOutputStream();
-    } catch (IOException e) {
-      e.printStackTrace();
+    new AsyncTask<Void, Void, Void>() {
+      @Override
+      protected Void doInBackground(Void... params) {
+        try {
+          BluetoothDevice device = adapter.getRemoteDevice(address);
+          BluetoothSocket socket = device.createRfcommSocketToServiceRecord(
+            SPP_UUID
+          );
+          socket.connect();
+          printer = socket.getOutputStream();
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+        return null;
+      }
     }
+      .execute();
   }
 
-  public void write(byte[] command) {
-    try {
-      if (printer != null) {
-        printer.write(command);
+  public void write(final byte[] command) {
+    new AsyncTask<Void, Void, Void>() {
+      @Override
+      protected Void doInBackground(Void... params) {
+        try {
+          if (printer != null) {
+            printer.write(command);
+          } else {
+            return null;
+          }
+        } catch (IOException e) {
+          e.printStackTrace();
+          return null;
+        }
+        return null;
       }
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
     }
+      .execute();
   }
 
   public void close() {
-    try {
-      if (printer != null) {
-        printer.close();
+    new AsyncTask<Void, Void, Void>() {
+      @Override
+      protected Void doInBackground(Void... params) {
+        try {
+          if (printer != null) {
+            printer.close();
+          } else {
+            // Handle the case where the printer is not available
+          }
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+        return null;
       }
-    } catch (IOException e) {
-      e.printStackTrace();
     }
+      .execute();
   }
 }
