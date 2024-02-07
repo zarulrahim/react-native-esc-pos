@@ -24,62 +24,75 @@ public class BluetoothPrinter implements Printer {
     this.address = address;
   }
 
-  public void open() {
-    new AsyncTask<Void, Void, Void>() {
-      @Override
-      protected Void doInBackground(Void... params) {
-        try {
-          BluetoothDevice device = adapter.getRemoteDevice(address);
-          BluetoothSocket socket = device.createRfcommSocketToServiceRecord(
-            SPP_UUID
-          );
-          socket.connect();
-          printer = socket.getOutputStream();
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
-        return null;
+  private class ConnectTask extends AsyncTask<Void, Void, Boolean> {
+
+    @Override
+    protected Boolean doInBackground(Void... params) {
+      try {
+        BluetoothDevice device = adapter.getRemoteDevice(address);
+        BluetoothSocket socket = device.createRfcommSocketToServiceRecord(
+          SPP_UUID
+        );
+
+        // This is a blocking operation, so move it to a background thread
+        socket.connect();
+        printer = socket.getOutputStream();
+        return true;
+      } catch (IOException e) {
+        e.printStackTrace();
+        return false;
       }
     }
-      .execute();
+
+    @Override
+    protected void onPostExecute(Boolean success) {
+      if (!success) {
+        // Handle connection failure if needed
+      }
+    }
   }
 
-  public void write(final byte[] command) {
-    new AsyncTask<Void, Void, Void>() {
-      @Override
-      protected Void doInBackground(Void... params) {
-        try {
-          if (printer != null) {
-            printer.write(command);
-          } else {
-            return null;
-          }
-        } catch (IOException e) {
-          e.printStackTrace();
-          return null;
+  public void open() {
+    new ConnectTask().execute();
+  }
+
+  private class WriteTask extends AsyncTask<byte[], Void, Void> {
+
+    @Override
+    protected Void doInBackground(byte[]... params) {
+      try {
+        if (printer != null) {
+          printer.write(params[0]);
         }
-        return null;
+      } catch (IOException e) {
+        // Handle the exception as needed
+        e.printStackTrace();
       }
+      return null;
     }
-      .execute();
+  }
+
+  public void write(byte[] command) {
+    new WriteTask().execute(command);
+  }
+
+  private class CloseTask extends AsyncTask<Void, Void, Void> {
+
+    @Override
+    protected Void doInBackground(Void... params) {
+      try {
+        if (printer != null) {
+          printer.close();
+        }
+      } catch (IOException e) {
+        // Handle the exception as needed
+        e.printStackTrace();
+      }
+      return null;
+    }
   }
 
   public void close() {
-    new AsyncTask<Void, Void, Void>() {
-      @Override
-      protected Void doInBackground(Void... params) {
-        try {
-          if (printer != null) {
-            printer.close();
-          } else {
-            // Handle the case where the printer is not available
-          }
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
-        return null;
-      }
-    }
-      .execute();
+    new CloseTask().execute();
   }
 }
