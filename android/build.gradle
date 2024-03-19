@@ -51,7 +51,7 @@ android {
     }
 
     dependencies {
-        implementation 'com.github.stefanosbou:esc-pos-java:master-SNAPSHOT'
+        implementation 'com.github.easyeat-ai:esc-pos-java:master-SNAPSHOT'
     }
 
 }
@@ -118,6 +118,8 @@ repositories {
         })
     }
 
+    maven { url 'https://jitpack.io' }
+
     if (!found) {
         throw new GradleException(
                 "${project.name}: unable to locate React Native android sources. " +
@@ -139,6 +141,7 @@ dependencies {
     implementation "androidx.work:work-runtime:2.7.1"
 
     implementation 'org.apache.commons:commons-lang3:3.4'
+    implementation files('libs/IminLibs.jar')
 }
 
 if (isNewArchitectureEnabled()) {

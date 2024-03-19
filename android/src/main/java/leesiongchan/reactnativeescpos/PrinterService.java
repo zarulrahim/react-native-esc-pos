@@ -6,6 +6,7 @@ import android.graphics.ImageDecoder;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
+import com.imin.library.IminSDKManager;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.google.zxing.BarcodeFormat;
@@ -195,6 +196,9 @@ public class PrinterService {
         basePrinterService.write(CD_KICK_5);
     }
 
+    public void kickCashDrawerImin() {
+        IminSDKManager.opencashBox();
+    }
     /**
      * DESIGN 1: Order List                       *
      *          D0004 | Table #: A1 {C} {H1}      *
@@ -272,7 +276,7 @@ public class PrinterService {
             int charsOnLine = layoutBuilder.getCharsOnLine();
 
             // TODO: Shouldn't put it here
-            byte[] ESC_t = new byte[] { 0x1b, 't', 0x00 };
+            byte[] ESC_t = new byte[] { 0x1b, ' ', 0x00 };
             byte[] ESC_M = new byte[] { 0x1b, 'M', 0x00 };
             byte[] FS_and = new byte[] { 0x1c, '&' };
             byte[] TXT_NORMAL_NEW = new byte[] { 0x1d, '!', 0x00 };
