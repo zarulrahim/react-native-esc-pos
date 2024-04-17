@@ -151,6 +151,12 @@ public class PrinterService {
         write(baos.toByteArray());
     }
 
+    public void addLineSpaceWithCharacter(String separatorCh) throws IOException {
+        if (separatorCh != null) {
+            write(separatorCh.getBytes());
+        }
+    }
+
     public void printQRCode(String value, int size) throws QRCodeException {
         ByteArrayOutputStream baos = generateQRCodeByteArrayOutputStream(value, size);
         write(baos.toByteArray());

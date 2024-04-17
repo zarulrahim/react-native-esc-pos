@@ -154,6 +154,16 @@ public class EscPosModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void addLineSpaceWithCharacter(String separatorCh , Promise promise) {
+        try {
+            printerService.addLineSpaceWithCharacter(separatorCh);
+            promise.resolve(true);
+        } catch (IOException e) {
+            promise.reject(e);
+        }
+    }
+
+    @ReactMethod
     public void printQRCode(String value, int size, Promise promise) {
         try {
             printerService.printQRCode(value, size);
