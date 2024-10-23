@@ -236,10 +236,17 @@ public class PrinterService {
             byte[] qtToWrite = null;
             byte[] imageToWrite = null;
             byte[] bcToWrite = null;
-            if (line.matches(".*\\{QR\\[(.+)\\]\\}.*")) {
+            if (line.matches(".*\\{QR\\[(.+?):?(\\d+)?\\]\\}.*")) {
                 try {
-                    qtToWrite = generateQRCodeByteArrayOutputStream(line.replaceAll(".*\\{QR\\[(.+)\\]\\}.*", "$1"),
-                            DEFAULT_QR_CODE_SIZE).toByteArray();
+                    // Extract the QR code value and size from the line
+                    String qrCodeValue = line.replaceAll(".*\\{QR\\[(.+?):?(\\d+)?\\]\\}.*", "$1");
+                    String qrSizeString = line.replaceAll(".*\\{QR\\[(.+?):?(\\d+)?\\]\\}.*", "$2");
+
+                    // Check if a QR size is provided; if not, use the default size
+                    int qrSize = (qrSizeString == null || qrSizeString.isEmpty()) ? DEFAULT_QR_CODE_SIZE : Integer.parseInt(qrSizeString);
+
+                    // Generate the QR code with the determined size
+                    qtToWrite = generateQRCodeByteArrayOutputStream(qrCodeValue, qrSize).toByteArray();
                 } catch (QRCodeException e) {
                     throw new IOException(e);
                 }
