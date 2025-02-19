@@ -6,6 +6,7 @@ import android.graphics.ImageDecoder;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
+import com.imin.library.IminSDKManager;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.google.zxing.BarcodeFormat;
@@ -23,11 +24,14 @@ import java.io.UnsupportedEncodingException;
 import java.lang.Math;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.nio.charset.Charset;
 
 import leesiongchan.reactnativeescpos.command.PrinterCommand;
 import leesiongchan.reactnativeescpos.helpers.EscPosHelper;
 import leesiongchan.reactnativeescpos.utils.BitMatrixUtils;
 import static io.github.escposjava.print.Commands.*;
+
+
 
 public class PrinterService {
     public static final int PRINTING_WIDTH_58_MM = 384;
@@ -113,11 +117,11 @@ public class PrinterService {
                 "------------------------------------------" + "\n" +
                 "       {QR[Where are the aliens?]}        " + "\n";
 
-        printDesign(design);
+        printDesign(design , false);
     }
 
-    public void printDesign(String text) throws IOException {
-        ByteArrayOutputStream baos = generateDesignByteArrayOutputStream(text);
+    public void printDesign(String text , boolean isThaiPrintEnabled) throws IOException {
+        ByteArrayOutputStream baos = generateDesignByteArrayOutputStream(text,isThaiPrintEnabled);
         write(baos.toByteArray());
     }
 
@@ -148,6 +152,12 @@ public class PrinterService {
         image = EscPosHelper.resizeImage(image, Math.max(printingWidth - Math.abs(widthOffset), 0), DEFAULT_IMG_MAX_HEIGHT);
         ByteArrayOutputStream baos = generateImageByteArrayOutputStream(image);
         write(baos.toByteArray());
+    }
+
+    public void addLineSpaceWithCharacter(String separatorCh) throws IOException {
+        if (separatorCh != null) {
+            write(separatorCh.getBytes());
+        }
     }
 
     public void printQRCode(String value, int size) throws QRCodeException {
@@ -195,6 +205,9 @@ public class PrinterService {
         basePrinterService.write(CD_KICK_5);
     }
 
+    public void kickCashDrawerImin() {
+        IminSDKManager.opencashBox();
+    }
     /**
      * DESIGN 1: Order List                       *
      *          D0004 | Table #: A1 {C} {H1}      *
@@ -217,7 +230,7 @@ public class PrinterService {
      * {QR[Love me, hate me.]} {C}                *
      * {BC[Your Barcode here]} {C}                *
      **/
-    private ByteArrayOutputStream generateDesignByteArrayOutputStream(String text) throws IOException {
+    private ByteArrayOutputStream generateDesignByteArrayOutputStream(String text , boolean isThaiPrintEnabled) throws IOException {
         BufferedReader reader = new BufferedReader(new StringReader(text.trim()));
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         String line;
@@ -226,10 +239,17 @@ public class PrinterService {
             byte[] qtToWrite = null;
             byte[] imageToWrite = null;
             byte[] bcToWrite = null;
-            if (line.matches(".*\\{QR\\[(.+)\\]\\}.*")) {
+            if (line.matches(".*\\{QR\\[(.+?):?(\\d+)?\\]\\}.*")) {
                 try {
-                    qtToWrite = generateQRCodeByteArrayOutputStream(line.replaceAll(".*\\{QR\\[(.+)\\]\\}.*", "$1"),
-                            DEFAULT_QR_CODE_SIZE).toByteArray();
+                    // Extract the QR code value and size from the line
+                    String qrCodeValue = line.replaceAll(".*\\{QR\\[(.+?):?(\\d+)?\\]\\}.*", "$1");
+                    String qrSizeString = line.replaceAll(".*\\{QR\\[(.+?):?(\\d+)?\\]\\}.*", "$2");
+
+                    // Check if a QR size is provided; if not, use the default size
+                    int qrSize = (qrSizeString == null || qrSizeString.isEmpty()) ? DEFAULT_QR_CODE_SIZE : Integer.parseInt(qrSizeString);
+
+                    // Generate the QR code with the determined size
+                    qtToWrite = generateQRCodeByteArrayOutputStream(qrCodeValue, qrSize).toByteArray();
                 } catch (QRCodeException e) {
                     throw new IOException(e);
                 }
@@ -272,7 +292,7 @@ public class PrinterService {
             int charsOnLine = layoutBuilder.getCharsOnLine();
 
             // TODO: Shouldn't put it here
-            byte[] ESC_t = new byte[] { 0x1b, 't', 0x00 };
+            byte[] ESC_t = new byte[] { 0x1b, ' ', 0x00 };
             byte[] ESC_M = new byte[] { 0x1b, 'M', 0x00 };
             byte[] FS_and = new byte[] { 0x1c, '&' };
             byte[] TXT_NORMAL_NEW = new byte[] { 0x1d, '!', 0x00 };
@@ -339,7 +359,7 @@ public class PrinterService {
                 }
                 if (qtToWrite == null && imageToWrite == null && bcToWrite == null) {
                     // TODO: get rid of GBK default!
-                    baos.write(layoutBuilder.createFromDesign(line, charsOnLine).getBytes("GBK"));
+                    baos.write(layoutBuilder.createFromDesign(line, charsOnLine).getBytes(isThaiPrintEnabled ? "TIS-620" : "GBK"));
                 }
             } catch (UnsupportedEncodingException e) {
                 // Do nothing?

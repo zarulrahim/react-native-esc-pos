@@ -78,8 +78,18 @@ public class EscPosHelper {
                 finalHeight = (int) ((float)maxWidth / ratioBitmap);
             }
             image = Bitmap.createScaledBitmap(image, finalWidth, finalHeight, true);
+            image = createPaddingBitmap(image,(maxWidth - image.getWidth()) / 2,0);
         }
         return image;
+    }
+
+
+    public static Bitmap createPaddingBitmap(Bitmap Src, int padding_x, int padding_y) {
+        Bitmap outputimage = Bitmap.createBitmap(Src.getWidth() + padding_x,Src.getHeight() + padding_y, Bitmap.Config.ARGB_8888);
+        Canvas can = new Canvas(outputimage);
+        can.drawARGB(255,255,255,0); //This represents White color
+        can.drawBitmap(Src, padding_x, padding_y, null);
+        return outputimage;
     }
 
     /**

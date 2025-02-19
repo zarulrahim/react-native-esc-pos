@@ -124,9 +124,9 @@ public class EscPosModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void printDesign(String text, Promise promise) {
+    public void printDesign(String text, boolean isThaiPrintEnabled , Promise promise) {
         try {
-            printerService.printDesign(text);
+            printerService.printDesign(text,isThaiPrintEnabled);
             promise.resolve(true);
         } catch (IOException e) {
             promise.reject(e);
@@ -147,6 +147,16 @@ public class EscPosModule extends ReactContextBaseJavaModule {
     public void printImageWithOffset(String filePath, int widthOffet, Promise promise) {
         try {
             printerService.printImage(filePath, widthOffet);
+            promise.resolve(true);
+        } catch (IOException e) {
+            promise.reject(e);
+        }
+    }
+
+    @ReactMethod
+    public void addLineSpaceWithCharacter(String separatorCh , Promise promise) {
+        try {
+            printerService.addLineSpaceWithCharacter(separatorCh);
             promise.resolve(true);
         } catch (IOException e) {
             promise.reject(e);
@@ -238,6 +248,11 @@ public class EscPosModule extends ReactContextBaseJavaModule {
         promise.resolve(true);
     }
 
+    @ReactMethod
+    public void kickCashDrawerImin(Promise promise) {
+        printerService.kickCashDrawerImin();
+        promise.resolve(true);
+    }
     @ReactMethod
     public void connectBluetoothPrinter(String address, Promise promise) {
         try {
