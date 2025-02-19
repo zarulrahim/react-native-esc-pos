@@ -24,11 +24,14 @@ import java.io.UnsupportedEncodingException;
 import java.lang.Math;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.nio.charset.Charset;
 
 import leesiongchan.reactnativeescpos.command.PrinterCommand;
 import leesiongchan.reactnativeescpos.helpers.EscPosHelper;
 import leesiongchan.reactnativeescpos.utils.BitMatrixUtils;
 import static io.github.escposjava.print.Commands.*;
+
+
 
 public class PrinterService {
     public static final int PRINTING_WIDTH_58_MM = 384;
@@ -114,11 +117,11 @@ public class PrinterService {
                 "------------------------------------------" + "\n" +
                 "       {QR[Where are the aliens?]}        " + "\n";
 
-        printDesign(design);
+        printDesign(design , false);
     }
 
-    public void printDesign(String text) throws IOException {
-        ByteArrayOutputStream baos = generateDesignByteArrayOutputStream(text);
+    public void printDesign(String text , boolean isThaiPrintEnabled) throws IOException {
+        ByteArrayOutputStream baos = generateDesignByteArrayOutputStream(text,isThaiPrintEnabled);
         write(baos.toByteArray());
     }
 
@@ -227,7 +230,7 @@ public class PrinterService {
      * {QR[Love me, hate me.]} {C}                *
      * {BC[Your Barcode here]} {C}                *
      **/
-    private ByteArrayOutputStream generateDesignByteArrayOutputStream(String text) throws IOException {
+    private ByteArrayOutputStream generateDesignByteArrayOutputStream(String text , boolean isThaiPrintEnabled) throws IOException {
         BufferedReader reader = new BufferedReader(new StringReader(text.trim()));
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         String line;
@@ -356,7 +359,7 @@ public class PrinterService {
                 }
                 if (qtToWrite == null && imageToWrite == null && bcToWrite == null) {
                     // TODO: get rid of GBK default!
-                    baos.write(layoutBuilder.createFromDesign(line, charsOnLine).getBytes("GBK"));
+                    baos.write(layoutBuilder.createFromDesign(line, charsOnLine).getBytes(isThaiPrintEnabled ? "TIS-620" : "GBK"));
                 }
             } catch (UnsupportedEncodingException e) {
                 // Do nothing?

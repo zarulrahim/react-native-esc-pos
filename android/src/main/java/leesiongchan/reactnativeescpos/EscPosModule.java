@@ -124,9 +124,9 @@ public class EscPosModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void printDesign(String text, Promise promise) {
+    public void printDesign(String text, boolean isThaiPrintEnabled , Promise promise) {
         try {
-            printerService.printDesign(text);
+            printerService.printDesign(text,isThaiPrintEnabled);
             promise.resolve(true);
         } catch (IOException e) {
             promise.reject(e);
